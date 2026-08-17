@@ -39,8 +39,7 @@ def get_kpis(db: Session, start_date: date | None = None, end_date: date | None 
     refund_rate = (refunded / total_orders_all * 100) if total_orders_all else 0.0
     avg_order_value = (row.revenue / row.orders) if row.orders else 0.0
 
-    # Month-over-month growth based on the last two full/partial months in range.
-    mom_growth = _revenue_mom_growth(db, start_date, end_date)
+    deltas = _monthly_kpi_deltas(db, start_date, end_date)
 
     return {
         "total_revenue": round(row.revenue, 2),
@@ -49,26 +48,79 @@ def get_kpis(db: Session, start_date: date | None = None, end_date: date | None 
         "avg_order_value": round(avg_order_value, 2),
         "unique_customers": row.customers,
         "refund_rate_pct": round(refund_rate, 2),
-        "revenue_mom_growth_pct": round(mom_growth, 2),
+        "revenue_mom_growth_pct": deltas["revenue_mom_growth_pct"],
+        "orders_mom_growth_pct": deltas["orders_mom_growth_pct"],
+        "aov_mom_growth_pct": deltas["aov_mom_growth_pct"],
+        "customers_mom_growth_pct": deltas["customers_mom_growth_pct"],
+        "refund_rate_mom_delta_pp": deltas["refund_rate_mom_delta_pp"],
     }
 
 
-def _revenue_mom_growth(db: Session, start_date: date | None, end_date: date | None) -> float:
+def _pct_growth(prev: float, curr: float) -> float:
+    if not prev:
+        return 0.0
+    return (curr - prev) / prev * 100
+
+
+def _monthly_kpi_deltas(db: Session, start_date: date | None, end_date: date | None) -> dict:
+    """Compares the last two calendar months in range across the headline KPIs,
+    so each stat tile can show a real month-over-month trend indicator."""
     filters = _date_filters(start_date, end_date)
     period_expr = func.strftime("%Y-%m", SalesOrder.order_date)
-    stmt = (
-        select(period_expr.label("period"), func.sum(SalesOrder.total_amount).label("revenue"))
+
+    completed_stmt = (
+        select(
+            period_expr.label("period"),
+            func.sum(SalesOrder.total_amount).label("revenue"),
+            func.count(SalesOrder.id).label("orders"),
+            func.count(func.distinct(SalesOrder.customer_id)).label("customers"),
+        )
         .where(SalesOrder.status == "Completed", *filters)
         .group_by(period_expr)
         .order_by(period_expr)
     )
-    rows = db.execute(stmt).all()
-    if len(rows) < 2:
-        return 0.0
-    prev, curr = rows[-2].revenue, rows[-1].revenue
-    if not prev:
-        return 0.0
-    return (curr - prev) / prev * 100
+    completed_rows = db.execute(completed_stmt).all()
+
+    total_stmt = (
+        select(period_expr.label("period"), func.count(SalesOrder.id).label("total"))
+        .where(*filters)
+        .group_by(period_expr)
+    )
+    total_by_period = {r.period: r.total for r in db.execute(total_stmt).all()}
+
+    refunded_stmt = (
+        select(period_expr.label("period"), func.count(SalesOrder.id).label("refunded"))
+        .where(SalesOrder.status == "Refunded", *filters)
+        .group_by(period_expr)
+    )
+    refunded_by_period = {r.period: r.refunded for r in db.execute(refunded_stmt).all()}
+
+    zeros = {
+        "revenue_mom_growth_pct": 0.0,
+        "orders_mom_growth_pct": 0.0,
+        "aov_mom_growth_pct": 0.0,
+        "customers_mom_growth_pct": 0.0,
+        "refund_rate_mom_delta_pp": 0.0,
+    }
+    if len(completed_rows) < 2:
+        return zeros
+
+    prev, curr = completed_rows[-2], completed_rows[-1]
+    prev_aov = (prev.revenue / prev.orders) if prev.orders else 0.0
+    curr_aov = (curr.revenue / curr.orders) if curr.orders else 0.0
+
+    def refund_rate_for(period: str) -> float:
+        total = total_by_period.get(period, 0)
+        refunded = refunded_by_period.get(period, 0)
+        return (refunded / total * 100) if total else 0.0
+
+    return {
+        "revenue_mom_growth_pct": round(_pct_growth(prev.revenue, curr.revenue), 2),
+        "orders_mom_growth_pct": round(_pct_growth(prev.orders, curr.orders), 2),
+        "aov_mom_growth_pct": round(_pct_growth(prev_aov, curr_aov), 2),
+        "customers_mom_growth_pct": round(_pct_growth(prev.customers, curr.customers), 2),
+        "refund_rate_mom_delta_pp": round(refund_rate_for(curr.period) - refund_rate_for(prev.period), 2),
+    }
 
 
 def get_revenue_trend(db: Session, start_date: date | None = None, end_date: date | None = None) -> list[dict]:

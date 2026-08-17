@@ -32,7 +32,14 @@ export default function App() {
               </NavLink>
             ))}
           </nav>
-          <div className="sidebar-footer">Powered by LangChain + OpenRouter</div>
+          <div className="sidebar-footer">
+            <svg viewBox="0 0 160 90" className="sidebar-illustration" aria-hidden="true">
+              <path d="M0 70 L35 30 L60 55 L90 15 L130 55 L160 40 L160 90 L0 90 Z" className="illus-back" />
+              <path d="M0 78 L45 48 L75 68 L110 38 L160 58 L160 90 L0 90 Z" className="illus-front" />
+              <circle cx="122" cy="20" r="7" className="illus-dot" />
+            </svg>
+            <span>Powered by LangChain + OpenRouter</span>
+          </div>
         </aside>
         <main>
           <Routes>

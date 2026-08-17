@@ -11,6 +11,10 @@ class KPISummary(BaseModel):
     unique_customers: int
     refund_rate_pct: float
     revenue_mom_growth_pct: float
+    orders_mom_growth_pct: float = 0.0
+    aov_mom_growth_pct: float = 0.0
+    customers_mom_growth_pct: float = 0.0
+    refund_rate_mom_delta_pp: float = 0.0
 
 
 class TrendPoint(BaseModel):

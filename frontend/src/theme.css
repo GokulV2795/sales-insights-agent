@@ -24,6 +24,15 @@
   --seq-400: #3987e5;
   --seq-500: #256abf;
   --seq-650: #104281;
+
+  --violet: #4a3aa7;
+  --badge-blue-bg: color-mix(in srgb, var(--series-1) 16%, var(--surface-card));
+  --badge-green-bg: color-mix(in srgb, var(--series-3) 16%, var(--surface-card));
+  --badge-orange-bg: color-mix(in srgb, var(--series-2) 16%, var(--surface-card));
+  --badge-violet-bg: color-mix(in srgb, var(--violet) 14%, var(--surface-card));
+  --badge-violet-fg: var(--violet);
+  --badge-pink-bg: color-mix(in srgb, var(--series-5) 18%, var(--surface-card));
+  --badge-amber-bg: color-mix(in srgb, var(--series-4) 18%, var(--surface-card));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,6 +56,7 @@
     --series-4: #c98500;
     --series-5: #d55181;
     --series-6: #008300;
+    --violet: #9085e9;
   }
 }
 
@@ -70,6 +80,7 @@
   --series-4: #c98500;
   --series-5: #d55181;
   --series-6: #008300;
+  --violet: #9085e9;
 }
 
 * {

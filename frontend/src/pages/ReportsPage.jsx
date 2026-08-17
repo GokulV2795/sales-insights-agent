@@ -3,6 +3,10 @@ import ReactMarkdown from "react-markdown";
 import { getCumulativeReport, getCumulativeReportPdfUrl, getDateBounds } from "../api/client";
 import RevenueTrendChart from "../components/RevenueTrendChart";
 import BreakdownBarChart from "../components/BreakdownBarChart";
+import DonutChart from "../components/DonutChart";
+import StatTile from "../components/StatTile";
+import { formatCompact, formatCurrencyCompact } from "../utils/format";
+import { IconCrown, IconGlobe, IconOrders, IconRevenue, IconUsers } from "../components/icons";
 
 export default function ReportsPage() {
   const [asOf, setAsOf] = useState("");
@@ -34,7 +38,10 @@ export default function ReportsPage() {
   return (
     <div className="page-pad">
       <div className="page-header">
-        <h1>Cumulative Sales Report</h1>
+        <div>
+          <h1>Cumulative Sales Report</h1>
+          <p className="page-subtitle">Running totals and an AI-generated executive summary as of a chosen date.</p>
+        </div>
         <div className="filter-row">
           <label>
             As of
@@ -71,22 +78,30 @@ export default function ReportsPage() {
           </div>
 
           <div className="stat-grid">
-            <div className="stat-tile">
-              <div className="stat-label">Cumulative Revenue</div>
-              <div className="stat-value">${report.kpis.total_revenue.toLocaleString()}</div>
-            </div>
-            <div className="stat-tile">
-              <div className="stat-label">Cumulative Orders</div>
-              <div className="stat-value">{report.kpis.total_orders.toLocaleString()}</div>
-            </div>
-            <div className="stat-tile">
-              <div className="stat-label">Cumulative Units</div>
-              <div className="stat-value">{report.kpis.total_units.toLocaleString()}</div>
-            </div>
-            <div className="stat-tile">
-              <div className="stat-label">Unique Customers</div>
-              <div className="stat-value">{report.kpis.unique_customers.toLocaleString()}</div>
-            </div>
+            <StatTile
+              label="Cumulative Revenue"
+              value={formatCurrencyCompact(report.kpis.total_revenue)}
+              icon={IconRevenue}
+              colorIndex={0}
+            />
+            <StatTile
+              label="Cumulative Orders"
+              value={formatCompact(report.kpis.total_orders)}
+              icon={IconOrders}
+              colorIndex={1}
+            />
+            <StatTile
+              label="Cumulative Units"
+              value={formatCompact(report.kpis.total_units)}
+              icon={IconCrown}
+              colorIndex={5}
+            />
+            <StatTile
+              label="Unique Customers"
+              value={formatCompact(report.kpis.unique_customers)}
+              icon={IconUsers}
+              colorIndex={3}
+            />
           </div>
 
           <div className="card">
@@ -96,12 +111,22 @@ export default function ReportsPage() {
 
           <div className="grid-2">
             <div className="card">
-              <h2>Top Products (Cumulative)</h2>
+              <div className="card-title-group" style={{ marginBottom: 14 }}>
+                <span className="card-title-icon" style={{ background: "var(--badge-amber-bg)", color: "var(--series-4)" }}>
+                  <IconCrown width={15} height={15} />
+                </span>
+                <h2>Top Products (Cumulative)</h2>
+              </div>
               <BreakdownBarChart data={report.top_products_cumulative} dataKey="revenue" labelKey="name" height={320} />
             </div>
             <div className="card">
-              <h2>Revenue by Region (Cumulative)</h2>
-              <BreakdownBarChart data={report.region_breakdown_cumulative} dataKey="revenue" labelKey="region" height={320} />
+              <div className="card-title-group" style={{ marginBottom: 14 }}>
+                <span className="card-title-icon" style={{ background: "var(--badge-blue-bg)", color: "var(--series-1)" }}>
+                  <IconGlobe width={15} height={15} />
+                </span>
+                <h2>Revenue by Region (Cumulative)</h2>
+              </div>
+              <DonutChart data={report.region_breakdown_cumulative} labelKey="region" valueKey="revenue" />
             </div>
           </div>
         </>

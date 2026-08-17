@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { getFinance, getDateBounds } from "../api/client";
 import StatTile from "../components/StatTile";
 import MultiLineTrendChart from "../components/MultiLineTrendChart";
-import StackedCompositionBar from "../components/StackedCompositionBar";
+import DonutChart from "../components/DonutChart";
 import Meter from "../components/Meter";
 import DateRangeFilter from "../components/DateRangeFilter";
+import { formatCurrencyCompact } from "../utils/format";
+import { IconChannel, IconFinance, IconGlobe, IconRefresh, IconRevenue } from "../components/icons";
 
 const TREND_SERIES = [
   { key: "revenue", label: "Revenue" },
@@ -39,7 +41,10 @@ export default function FinancePage() {
   return (
     <div className="page-pad">
       <div className="page-header">
-        <h1>Finance</h1>
+        <div>
+          <h1>Finance</h1>
+          <p className="page-subtitle">Revenue, cost of goods, and profitability over time.</p>
+        </div>
         <DateRangeFilter bounds={bounds} range={range} setRange={setRange} />
       </div>
 
@@ -48,10 +53,20 @@ export default function FinancePage() {
       ) : (
         <>
           <div className="stat-grid">
-            <StatTile label="Revenue" value={`$${data.summary.revenue.toLocaleString()}`} />
-            <StatTile label="COGS" value={`$${data.summary.cogs.toLocaleString()}`} />
-            <StatTile label="Gross Profit" value={`$${data.summary.gross_profit.toLocaleString()}`} />
-            <StatTile label="Refunded Revenue" value={`$${data.summary.refunded_revenue.toLocaleString()}`} />
+            <StatTile label="Revenue" value={formatCurrencyCompact(data.summary.revenue)} icon={IconRevenue} colorIndex={0} />
+            <StatTile label="COGS" value={formatCurrencyCompact(data.summary.cogs)} icon={IconFinance} colorIndex={2} />
+            <StatTile
+              label="Gross Profit"
+              value={formatCurrencyCompact(data.summary.gross_profit)}
+              icon={IconFinance}
+              colorIndex={1}
+            />
+            <StatTile
+              label="Refunded Revenue"
+              value={formatCurrencyCompact(data.summary.refunded_revenue)}
+              icon={IconRefresh}
+              colorIndex={4}
+            />
           </div>
 
           <div className="grid-2">
@@ -70,12 +85,22 @@ export default function FinancePage() {
 
           <div className="grid-2">
             <div className="card">
-              <h2>Revenue by Region</h2>
-              <StackedCompositionBar data={data.region_breakdown} labelKey="region" valueKey="revenue" />
+              <div className="card-title-group" style={{ marginBottom: 14 }}>
+                <span className="card-title-icon" style={{ background: "var(--badge-blue-bg)", color: "var(--series-1)" }}>
+                  <IconGlobe width={15} height={15} />
+                </span>
+                <h2>Revenue by Region</h2>
+              </div>
+              <DonutChart data={data.region_breakdown} labelKey="region" valueKey="revenue" />
             </div>
             <div className="card">
-              <h2>Revenue by Channel</h2>
-              <StackedCompositionBar data={data.channel_breakdown} labelKey="channel" valueKey="revenue" />
+              <div className="card-title-group" style={{ marginBottom: 14 }}>
+                <span className="card-title-icon" style={{ background: "var(--badge-green-bg)", color: "var(--series-3)" }}>
+                  <IconChannel width={15} height={15} />
+                </span>
+                <h2>Revenue by Channel</h2>
+              </div>
+              <DonutChart data={data.channel_breakdown} labelKey="channel" valueKey="revenue" />
             </div>
           </div>
         </>

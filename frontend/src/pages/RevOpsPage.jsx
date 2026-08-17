@@ -3,10 +3,12 @@ import { getRevOps, getDateBounds } from "../api/client";
 import StatTile from "../components/StatTile";
 import SimpleAreaChart from "../components/SimpleAreaChart";
 import BreakdownBarChart from "../components/BreakdownBarChart";
-import StackedCompositionBar from "../components/StackedCompositionBar";
+import DonutChart from "../components/DonutChart";
 import Meter from "../components/Meter";
 import DataTable from "../components/DataTable";
 import DateRangeFilter from "../components/DateRangeFilter";
+import { formatCompact } from "../utils/format";
+import { IconTag, IconUsers } from "../components/icons";
 
 export default function RevOpsPage() {
   const [data, setData] = useState(null);
@@ -35,7 +37,10 @@ export default function RevOpsPage() {
   return (
     <div className="page-pad">
       <div className="page-header">
-        <h1>RevOps</h1>
+        <div>
+          <h1>RevOps</h1>
+          <p className="page-subtitle">Customer acquisition, retention, and channel performance.</p>
+        </div>
         <DateRangeFilter bounds={bounds} range={range} setRange={setRange} />
       </div>
 
@@ -44,9 +49,24 @@ export default function RevOpsPage() {
       ) : (
         <>
           <div className="stat-grid">
-            <StatTile label="Active Customers" value={data.retention.total_active_customers.toLocaleString()} />
-            <StatTile label="Repeat Customers" value={data.retention.repeat_customers.toLocaleString()} />
-            <StatTile label="Avg Orders / Customer" value={data.retention.avg_orders_per_customer} />
+            <StatTile
+              label="Active Customers"
+              value={formatCompact(data.retention.total_active_customers)}
+              icon={IconUsers}
+              colorIndex={3}
+            />
+            <StatTile
+              label="Repeat Customers"
+              value={formatCompact(data.retention.repeat_customers)}
+              icon={IconUsers}
+              colorIndex={0}
+            />
+            <StatTile
+              label="Avg Orders / Customer"
+              value={data.retention.avg_orders_per_customer}
+              icon={IconTag}
+              colorIndex={2}
+            />
           </div>
 
           <div className="grid-2">
@@ -71,8 +91,13 @@ export default function RevOpsPage() {
 
           <div className="grid-2">
             <div className="card">
-              <h2>Revenue by Customer Segment</h2>
-              <StackedCompositionBar data={data.segment_breakdown} labelKey="segment" valueKey="revenue" />
+              <div className="card-title-group" style={{ marginBottom: 14 }}>
+                <span className="card-title-icon" style={{ background: "var(--badge-violet-bg)", color: "var(--badge-violet-fg)" }}>
+                  <IconUsers width={15} height={15} />
+                </span>
+                <h2>Revenue by Customer Segment</h2>
+              </div>
+              <DonutChart data={data.segment_breakdown} labelKey="segment" valueKey="revenue" />
             </div>
             <div className="card">
               <h2>Avg Order Value by Channel</h2>
