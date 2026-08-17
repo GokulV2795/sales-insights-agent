@@ -1,0 +1,13 @@
+project_id = "your-gcp-project-id"
+
+# OpenRouter
+openrouter_api_key   = "sk-or-v1-your-key-here"
+openrouter_model     = "anthropic/claude-haiku-4.5"
+openrouter_site_url  = "http://localhost"
+openrouter_site_name = "My OpenRouter Chatbot"
+
+# Optional overrides
+# region        = "us-central1"
+# zone          = "us-central1-a"
+# machine_type  = "e2-micro"
+# instance_name = "sales-insights-vm"
