@@ -141,6 +141,23 @@ export function IconGlobe(props) {
   );
 }
 
+export function IconSun(props) {
+  return (
+    <svg {...common} {...props}>
+      <circle cx="12" cy="12" r="4.5" />
+      <path d="M12 2.5v2.5M12 19v2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2.5 12H5M19 12h2.5M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" />
+    </svg>
+  );
+}
+
+export function IconMoon(props) {
+  return (
+    <svg {...common} {...props}>
+      <path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" />
+    </svg>
+  );
+}
+
 export function IconChannel(props) {
   return (
     <svg {...common} {...props}>

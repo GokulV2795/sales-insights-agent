@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getIsDark, subscribeTheme } from "./theme";
 
 const LIGHT = {
   series: ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"],
@@ -23,16 +24,9 @@ const DARK = {
 };
 
 export default function useChartColors() {
-  const [isDark, setIsDark] = useState(
-    () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
+  const [isDark, setIsDark] = useState(getIsDark);
 
-  useEffect(() => {
-    const mql = window.matchMedia("(prefers-color-scheme: dark)");
-    const listener = (e) => setIsDark(e.matches);
-    mql.addEventListener("change", listener);
-    return () => mql.removeEventListener("change", listener);
-  }, []);
+  useEffect(() => subscribeTheme(() => setIsDark(getIsDark())), []);
 
   return isDark ? DARK : LIGHT;
 }

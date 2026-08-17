@@ -5,6 +5,7 @@ import FinancePage from "./pages/FinancePage";
 import RevOpsPage from "./pages/RevOpsPage";
 import ReportsPage from "./pages/ReportsPage";
 import ChatWidget from "./components/ChatWidget";
+import ThemeToggle from "./components/ThemeToggle";
 import { IconDashboard, IconFinance, IconProduct, IconReports, IconRevOps } from "./components/icons";
 
 const NAV_ITEMS = [
@@ -24,6 +25,10 @@ export default function App() {
             <span className="brand-mark" />
             <span>Sales Insights</span>
           </div>
+          <div className="sidebar-theme-row">
+            <span>Theme</span>
+            <ThemeToggle />
+          </div>
           <nav>
             {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
               <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? "active" : "")}>
@@ -34,9 +39,13 @@ export default function App() {
           </nav>
           <div className="sidebar-footer">
             <svg viewBox="0 0 160 90" className="sidebar-illustration" aria-hidden="true">
-              <path d="M0 70 L35 30 L60 55 L90 15 L130 55 L160 40 L160 90 L0 90 Z" className="illus-back" />
-              <path d="M0 78 L45 48 L75 68 L110 38 L160 58 L160 90 L0 90 Z" className="illus-front" />
-              <circle cx="122" cy="20" r="7" className="illus-dot" />
+              <rect x="14" y="62" width="16" height="20" rx="3" className="illus-bar illus-bar-1" />
+              <rect x="42" y="50" width="16" height="32" rx="3" className="illus-bar illus-bar-2" />
+              <rect x="70" y="56" width="16" height="26" rx="3" className="illus-bar illus-bar-3" />
+              <rect x="98" y="38" width="16" height="44" rx="3" className="illus-bar illus-bar-4" />
+              <rect x="126" y="24" width="16" height="58" rx="3" className="illus-bar illus-bar-5" />
+              <polyline points="22,54 50,42 78,48 106,30 134,16" className="illus-trend" />
+              <circle cx="134" cy="16" r="4.5" className="illus-dot" />
             </svg>
             <span>Powered by LangChain + OpenRouter</span>
           </div>
