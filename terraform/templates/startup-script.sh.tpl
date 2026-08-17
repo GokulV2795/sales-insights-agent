@@ -3,6 +3,9 @@
 # from Artifact Registry and (re)starts both containers.
 set -euo pipefail
 
+# COS mounts /root read-only; point HOME at a writable tmpfs path so the
+# Docker credential helper can write its config.
+export HOME=/tmp
 docker-credential-gcr configure-docker --registries=${region}-docker.pkg.dev
 
 docker pull ${backend_image}
