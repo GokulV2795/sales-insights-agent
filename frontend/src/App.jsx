@@ -52,11 +52,11 @@ export default function App() {
         </aside>
         <main>
           <Routes>
-            <Route path="/" element={<Sales />} />
-            <Route path="/product" element={<ProductPerformance />} />
-            <Route path="/finance" element={<Finance />} />
-            <Route path="/revops" element={<RevOps />} />
-            <Route path="/reports" element={<Reports />} />
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/product" element={<ProductPerformancePage />} />
+            <Route path="/finance" element={<FinancePage />} />
+            <Route path="/revops" element={<RevOpsPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
           </Routes>
         </main>
         <ChatWidget />

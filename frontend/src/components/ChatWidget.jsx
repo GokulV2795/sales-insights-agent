@@ -61,8 +61,15 @@ export default function ChatWidget() {
   }
 
   async function handleReset() {
-    await resetChatSession(SESSION_ID);
-    setMessages([{ role: "assistant", content: "Conversation cleared. What would you like to know?" }]);
+    try {
+      await resetChatSession(SESSION_ID);
+      setMessages([{ role: "assistant", content: "Conversation cleared. What would you like to know?" }]);
+    } catch (e) {
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", content: `Sorry, I couldn't reset the conversation: ${e.response?.data?.detail || e.message}` },
+      ]);
+    }
   }
 
   return (

@@ -33,7 +33,7 @@ export default function ReportsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const trendData = report?.cumulative_trend.map((p) => ({ period: p.period, revenue: p.cumulative_revenue, orders: p.cumulative_orders }));
+  const trendData = report?.cumulative_trend?.map((p) => ({ period: p.period, revenue: p.cumulative_revenue, orders: p.cumulative_orders }));
 
   return (
     <div className="page-pad">

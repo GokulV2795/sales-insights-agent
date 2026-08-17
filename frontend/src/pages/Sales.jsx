@@ -55,7 +55,7 @@ export default function DashboardPage() {
     return <div className="page-pad error-box">Failed to load dashboard: {error}</div>;
   }
 
-  const sparklineData = data?.revenue_trend.slice(-8).map((p) => ({ period: p.period, revenue: p.revenue }));
+  const sparklineData = data?.revenue_trend?.slice(-8).map((p) => ({ period: p.period, revenue: p.revenue }));
 
   return (
     <div className="page-pad">
