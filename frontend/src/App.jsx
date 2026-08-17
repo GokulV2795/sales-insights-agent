@@ -1,9 +1,9 @@
 import { NavLink, Route, HashRouter, Routes } from "react-router-dom";
-import DashboardPage from "./pages/DashboardPage";
-import ProductPerformancePage from "./pages/ProductPerformancePage";
-import FinancePage from "./pages/FinancePage";
-import RevOpsPage from "./pages/RevOpsPage";
-import ReportsPage from "./pages/ReportsPage";
+import DashboardPage from "./pages/Sales";
+import ProductPerformancePage from "./pages/ProductPerformance";
+import FinancePage from "./pages/Finance";
+import RevOpsPage from "./pages/RevOps";
+import ReportsPage from "./pages/Reports";
 import ChatWidget from "./components/ChatWidget";
 import ThemeToggle from "./components/ThemeToggle";
 import { IconDashboard, IconFinance, IconProduct, IconReports, IconRevOps } from "./components/icons";
@@ -52,11 +52,11 @@ export default function App() {
         </aside>
         <main>
           <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/product" element={<ProductPerformancePage />} />
-            <Route path="/finance" element={<FinancePage />} />
-            <Route path="/revops" element={<RevOpsPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/" element={<Sales />} />
+            <Route path="/product" element={<ProductPerformance />} />
+            <Route path="/finance" element={<Finance />} />
+            <Route path="/revops" element={<RevOps />} />
+            <Route path="/reports" element={<Reports />} />
           </Routes>
         </main>
         <ChatWidget />
