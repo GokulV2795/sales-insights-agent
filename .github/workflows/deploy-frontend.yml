@@ -1,0 +1,64 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/deploy-frontend.yml"
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REGION: us-central1
+  BACKEND_SERVICE: sales-insights-backend
+  FRONTEND_SERVICE: sales-insights-frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get backend URL
+        id: backend_url
+        run: |
+          URL=$(gcloud run services describe "$BACKEND_SERVICE" \
+            --project="${{ vars.GCP_PROJECT_ID }}" --region="$REGION" \
+            --format='value(status.url)')
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy frontend to Cloud Run
+        run: |
+          gcloud run deploy "$FRONTEND_SERVICE" \
+            --source=frontend \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="$REGION" \
+            --platform=managed \
+            --allow-unauthenticated \
+            --memory=256Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=3 \
+            --update-env-vars="API_BASE_URL=${{ steps.backend_url.outputs.url }}"
+
+      - name: Restrict backend CORS to frontend origin
+        run: |
+          FRONTEND_URL=$(gcloud run services describe "$FRONTEND_SERVICE" \
+            --project="${{ vars.GCP_PROJECT_ID }}" --region="$REGION" \
+            --format='value(status.url)')
+          gcloud run services update "$BACKEND_SERVICE" \
+            --project="${{ vars.GCP_PROJECT_ID }}" --region="$REGION" \
+            --update-env-vars="CORS_ORIGINS=$FRONTEND_URL"
+          echo "Frontend: $FRONTEND_URL"

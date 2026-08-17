@@ -1,0 +1,28 @@
+# Python
+backend/.venv/
+__pycache__/
+*.pyc
+.pip-cache/
+
+# Env secrets
+.env
+backend/.env
+
+# Data
+backend/app/data/*.db
+
+# Node
+frontend/node_modules/
+.npm-cache/
+frontend/dist/
+
+# Claude Code local state
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# GCP
+*.json.key
+key.json

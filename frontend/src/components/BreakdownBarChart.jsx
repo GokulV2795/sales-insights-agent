@@ -1,0 +1,58 @@
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import useChartColors from "../hooks/useChartColors";
+
+function CustomTooltip({ active, payload, colors, valueLabel }) {
+  if (!active || !payload || !payload.length) return null;
+  const p = payload[0].payload;
+  return (
+    <div
+      style={{
+        background: colors.surface,
+        border: `1px solid ${colors.gridline}`,
+        borderRadius: 8,
+        padding: "8px 12px",
+        fontSize: 13,
+        color: colors.textSecondary,
+      }}
+    >
+      <div style={{ fontWeight: 600, marginBottom: 4 }}>{p.label}</div>
+      <div>
+        {valueLabel}: ${p.value.toLocaleString()}
+      </div>
+    </div>
+  );
+}
+
+export default function BreakdownBarChart({ data, dataKey, labelKey, valueLabel = "Revenue", height = 280 }) {
+  const colors = useChartColors();
+  const chartData = data.map((d) => ({ label: d[labelKey], value: d[dataKey] }));
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 24, left: 8, bottom: 4 }}>
+        <CartesianGrid stroke={colors.gridline} horizontal={false} />
+        <XAxis
+          type="number"
+          tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+          tick={{ fill: colors.textMuted, fontSize: 12 }}
+          axisLine={false}
+          tickLine={false}
+        />
+        <YAxis
+          type="category"
+          dataKey="label"
+          tick={{ fill: colors.textSecondary, fontSize: 12 }}
+          axisLine={false}
+          tickLine={false}
+          width={140}
+        />
+        <Tooltip content={<CustomTooltip colors={colors} valueLabel={valueLabel} />} cursor={{ fill: colors.gridline, opacity: 0.4 }} />
+        <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={22}>
+          {chartData.map((_, i) => (
+            <Cell key={i} fill={colors.series[0]} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}

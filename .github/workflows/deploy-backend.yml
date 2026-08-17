@@ -1,0 +1,51 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REGION: us-central1
+  SERVICE_NAME: sales-insights-backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE_NAME" \
+            --source=backend \
+            --project="${{ vars.GCP_PROJECT_ID }}" \
+            --region="$REGION" \
+            --platform=managed \
+            --allow-unauthenticated \
+            --memory=1Gi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=3 \
+            --update-env-vars="OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }},OPENROUTER_MODEL=${{ vars.OPENROUTER_MODEL }},OPENROUTER_SITE_URL=${{ vars.OPENROUTER_SITE_URL }},OPENROUTER_SITE_NAME=${{ vars.OPENROUTER_SITE_NAME }},GCP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }}"
+
+      - name: Show service URL
+        run: |
+          gcloud run services describe "$SERVICE_NAME" \
+            --project="${{ vars.GCP_PROJECT_ID }}" --region="$REGION" \
+            --format='value(status.url)'
