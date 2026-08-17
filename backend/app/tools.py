@@ -102,6 +102,49 @@ def get_channel_breakdown(start_date: str | None = None, end_date: str | None = 
         db.close()
 
 
+@tool
+def get_product_margins(start_date: str | None = None, end_date: str | None = None, limit: int = 15) -> str:
+    """Get per-product revenue, gross profit, and margin % (product performance /
+    profitability view), ranked by revenue. Dates optional, YYYY-MM-DD."""
+    db = SessionLocal()
+    try:
+        data = analytics.get_product_margins(db, _parse_date(start_date), _parse_date(end_date), limit)
+        return json.dumps(data)
+    finally:
+        db.close()
+
+
+@tool
+def get_finance_summary(start_date: str | None = None, end_date: str | None = None) -> str:
+    """Get finance KPIs: revenue, COGS, gross profit, gross margin %, refunded
+    revenue, and discount impact. Dates optional, YYYY-MM-DD."""
+    db = SessionLocal()
+    try:
+        data = analytics.get_finance_summary(db, _parse_date(start_date), _parse_date(end_date))
+        return json.dumps(data)
+    finally:
+        db.close()
+
+
+@tool
+def get_revops_metrics(start_date: str | None = None, end_date: str | None = None) -> str:
+    """Get RevOps metrics: new customer acquisition trend, revenue by customer
+    segment (Enterprise/SMB/Consumer), repeat purchase / retention rate, and
+    channel performance (revenue, orders, avg order value per channel).
+    Dates optional, YYYY-MM-DD."""
+    db = SessionLocal()
+    try:
+        data = {
+            "new_customers_trend": analytics.get_new_customers_trend(db, _parse_date(start_date), _parse_date(end_date)),
+            "segment_breakdown": analytics.get_segment_breakdown(db, _parse_date(start_date), _parse_date(end_date)),
+            "retention": analytics.get_customer_retention(db, _parse_date(start_date), _parse_date(end_date)),
+            "channel_performance": analytics.get_channel_performance(db, _parse_date(start_date), _parse_date(end_date)),
+        }
+        return json.dumps(data)
+    finally:
+        db.close()
+
+
 @tool(description="Run a read-only SQL SELECT query against the sales database for "
     "questions the other tools can't answer directly (e.g. specific customer "
     "lookups, unusual groupings, filtering by segment/sku/channel together). "
@@ -133,5 +176,8 @@ ALL_TOOLS = [
     get_region_breakdown,
     get_category_breakdown,
     get_channel_breakdown,
+    get_product_margins,
+    get_finance_summary,
+    get_revops_metrics,
     run_sql_query,
 ]

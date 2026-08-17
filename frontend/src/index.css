@@ -1,58 +1,95 @@
 .app-shell {
   min-height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 28px;
+.sidebar {
+  width: 232px;
+  flex-shrink: 0;
   background: var(--surface-card);
-  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
   position: sticky;
   top: 0;
-  z-index: 10;
+  height: 100vh;
+  padding: 22px 14px;
 }
 
 .brand {
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: -0.01em;
-}
-
-.topbar nav {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 9px;
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: -0.01em;
+  padding: 0 10px;
+  margin-bottom: 26px;
 }
 
-.topbar nav a {
-  padding: 8px 14px;
-  border-radius: 8px;
+.brand-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--series-1), var(--series-3));
+  flex-shrink: 0;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 9px;
   color: var(--text-secondary);
   text-decoration: none;
-  font-size: 0.92rem;
+  font-size: 0.89rem;
   font-weight: 500;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
-.topbar nav a:hover {
+.sidebar nav a svg {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.sidebar nav a:hover {
   background: var(--surface-2);
+  color: var(--text-primary);
 }
 
-.topbar nav a.active {
+.sidebar nav a.active {
   background: var(--series-1);
   color: white;
 }
 
+.sidebar nav a.active svg {
+  opacity: 1;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
 main {
   flex: 1;
+  min-width: 0;
 }
 
 .page-pad {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 28px 24px 64px;
+  padding: 32px 32px 64px;
 }
 
 .page-header {
@@ -121,6 +158,13 @@ main {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px 18px;
+  box-shadow: 0 1px 2px rgba(11, 11, 11, 0.04);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.stat-tile:hover {
+  box-shadow: 0 4px 16px rgba(11, 11, 11, 0.08);
+  transform: translateY(-1px);
 }
 
 .stat-label {
@@ -155,12 +199,39 @@ main {
   border-radius: 14px;
   padding: 20px 22px;
   margin-bottom: 18px;
+  box-shadow: 0 1px 2px rgba(11, 11, 11, 0.04);
 }
 
 .card h2 {
   font-size: 1rem;
-  margin: 0 0 12px;
-  color: var(--text-secondary);
+  margin: 0 0 4px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.card-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.card-row h2 {
+  margin-bottom: 0;
+}
+
+.meter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  justify-content: space-around;
 }
 
 .grid-2 {
@@ -179,6 +250,27 @@ main {
   }
 }
 
+@media (max-width: 720px) {
+  .sidebar {
+    width: 64px;
+    padding: 18px 8px;
+    align-items: center;
+  }
+  .brand span:last-child,
+  .sidebar nav a span,
+  .sidebar-footer {
+    display: none;
+  }
+  .brand {
+    padding: 0;
+    justify-content: center;
+  }
+  .sidebar nav a {
+    justify-content: center;
+    padding: 10px;
+  }
+}
+
 .loading-box,
 .error-box {
   padding: 40px;
@@ -192,20 +284,115 @@ main {
 
 /* Chat page */
 
-.chat-page {
+/* Chat widget: floating button + popup */
+
+.chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--series-1);
+  color: white;
   display: flex;
-  flex-direction: column;
-  height: calc(100vh - 140px);
-  min-height: 500px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  z-index: 40;
+  transition: transform 0.15s ease;
 }
 
-.chat-window {
-  flex: 1;
+.chat-fab:hover {
+  transform: scale(1.06);
+}
+
+.chat-fab.hidden {
+  display: none;
+}
+
+.chat-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 24px;
+  z-index: 50;
+}
+
+.chat-popup {
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 560px;
+  max-height: calc(100vh - 48px);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  padding: 0;
   overflow: hidden;
+  animation: chat-pop-in 0.16s ease-out;
+}
+
+@keyframes chat-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.chat-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chat-popup-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.chat-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  display: inline-block;
+}
+
+.chat-popup-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-icon {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-icon:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
 }
 
 .chat-messages {
@@ -341,4 +528,202 @@ main {
 .report-meta {
   font-size: 0.78rem;
   color: var(--text-muted);
+}
+
+/* Data table */
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+}
+
+.data-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--gridline);
+  color: var(--text-primary);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.text-good {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.text-bad {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* Meter (radial gauge) */
+
+.meter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.meter-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.meter-caption {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Composition bar (100%-stacked, single bar) */
+
+.composition-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.composition-bar {
+  display: flex;
+  width: 100%;
+  height: 26px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.composition-segment {
+  height: 100%;
+  border-right: 2px solid var(--surface-card);
+  transition: opacity 0.12s ease;
+}
+
+.composition-segment:last-child {
+  border-right: none;
+}
+
+.composition-segment:hover {
+  opacity: 0.85;
+}
+
+.composition-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+}
+
+.composition-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  color: var(--text-secondary);
+}
+
+.legend-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Activity heatmap */
+
+.heatmap-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: 44px repeat(24, 1fr);
+  gap: 3px;
+  overflow-x: auto;
+}
+
+.heatmap-corner {
+  grid-column: 1;
+}
+
+.heatmap-hour-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.heatmap-row {
+  display: contents;
+}
+
+.heatmap-day-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  min-width: 10px;
+  border-radius: 2px;
+  cursor: default;
+}
+
+.heatmap-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.heatmap-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.heatmap-tooltip {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
 }

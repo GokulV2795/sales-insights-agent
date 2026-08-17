@@ -23,7 +23,11 @@ function CustomTooltip({ active, payload, colors, valueLabel }) {
   );
 }
 
-export default function BreakdownBarChart({ data, dataKey, labelKey, valueLabel = "Revenue", height = 280 }) {
+function defaultTickFormat(v) {
+  return Math.abs(v) >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v.toFixed(0)}`;
+}
+
+export default function BreakdownBarChart({ data, dataKey, labelKey, valueLabel = "Revenue", height = 280, tickFormatter }) {
   const colors = useChartColors();
   const chartData = data.map((d) => ({ label: d[labelKey], value: d[dataKey] }));
 
@@ -33,7 +37,7 @@ export default function BreakdownBarChart({ data, dataKey, labelKey, valueLabel 
         <CartesianGrid stroke={colors.gridline} horizontal={false} />
         <XAxis
           type="number"
-          tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+          tickFormatter={tickFormatter || defaultTickFormat}
           tick={{ fill: colors.textMuted, fontSize: 12 }}
           axisLine={false}
           tickLine={false}

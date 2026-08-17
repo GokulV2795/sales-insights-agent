@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { getCumulativeReport, getCumulativeReportPdfUrl, getDateBounds } from "../api/client";
 import RevenueTrendChart from "../components/RevenueTrendChart";
 import BreakdownBarChart from "../components/BreakdownBarChart";
@@ -63,7 +64,7 @@ export default function ReportsPage() {
         <>
           <div className="card narrative-card">
             <h2>Executive Summary</h2>
-            <p>{report.narrative_summary}</p>
+            <ReactMarkdown>{report.narrative_summary}</ReactMarkdown>
             <div className="report-meta">
               As of {report.as_of} · generated {new Date(report.generated_at).toLocaleString()}
             </div>

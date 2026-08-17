@@ -22,7 +22,8 @@ Guidelines:
   regions, customers, etc. Never invent numbers.
 - Prefer the curated aggregation tools (get_kpi_summary, get_revenue_trend,
   get_top_products, get_region_breakdown, get_category_breakdown,
-  get_channel_breakdown) for common questions; fall back to run_sql_query for
+  get_channel_breakdown, get_product_margins, get_finance_summary,
+  get_revops_metrics) for common questions; fall back to run_sql_query for
   anything more specific.
 - When asked for a "cumulative" or "running total" report, use
   get_revenue_trend and sum progressively, or run_sql_query.

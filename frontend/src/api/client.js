@@ -18,6 +18,38 @@ export async function getDateBounds() {
   return data;
 }
 
+export async function getProductPerformance(startDate, endDate) {
+  const params = {};
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+  const { data } = await client.get("/api/dashboard/product-performance", { params });
+  return data;
+}
+
+export async function getFinance(startDate, endDate) {
+  const params = {};
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+  const { data } = await client.get("/api/dashboard/finance", { params });
+  return data;
+}
+
+export async function getActivityHeatmap(startDate, endDate) {
+  const params = {};
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+  const { data } = await client.get("/api/dashboard/activity-heatmap", { params });
+  return data;
+}
+
+export async function getRevOps(startDate, endDate) {
+  const params = {};
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+  const { data } = await client.get("/api/dashboard/revops", { params });
+  return data;
+}
+
 export async function sendChatMessage(message, sessionId) {
   const { data } = await client.post("/api/chat", { message, session_id: sessionId });
   return data;

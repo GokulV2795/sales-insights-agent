@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { getDashboard, getDateBounds } from "../api/client";
+import { getActivityHeatmap, getDashboard, getDateBounds } from "../api/client";
 import StatTile from "../components/StatTile";
 import RevenueTrendChart from "../components/RevenueTrendChart";
 import BreakdownBarChart from "../components/BreakdownBarChart";
+import StackedCompositionBar from "../components/StackedCompositionBar";
+import ActivityHeatmap from "../components/ActivityHeatmap";
+import DateRangeFilter from "../components/DateRangeFilter";
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);
+  const [heatmap, setHeatmap] = useState(null);
   const [bounds, setBounds] = useState(null);
   const [range, setRange] = useState({ start: "", end: "" });
   const [loading, setLoading] = useState(true);
@@ -18,8 +22,14 @@ export default function DashboardPage() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    getDashboard(range.start || undefined, range.end || undefined)
-      .then(setData)
+    Promise.all([
+      getDashboard(range.start || undefined, range.end || undefined),
+      getActivityHeatmap(range.start || undefined, range.end || undefined),
+    ])
+      .then(([dashboardData, heatmapData]) => {
+        setData(dashboardData);
+        setHeatmap(heatmapData);
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [range]);
@@ -32,33 +42,7 @@ export default function DashboardPage() {
     <div className="page-pad">
       <div className="page-header">
         <h1>Sales Dashboard</h1>
-        <div className="filter-row">
-          <label>
-            From
-            <input
-              type="date"
-              min={bounds?.min_date}
-              max={bounds?.max_date}
-              value={range.start}
-              onChange={(e) => setRange((r) => ({ ...r, start: e.target.value }))}
-            />
-          </label>
-          <label>
-            To
-            <input
-              type="date"
-              min={bounds?.min_date}
-              max={bounds?.max_date}
-              value={range.end}
-              onChange={(e) => setRange((r) => ({ ...r, end: e.target.value }))}
-            />
-          </label>
-          {(range.start || range.end) && (
-            <button className="btn-ghost" onClick={() => setRange({ start: "", end: "" })}>
-              Clear
-            </button>
-          )}
-        </div>
+        <DateRangeFilter bounds={bounds} range={range} setRange={setRange} />
       </div>
 
       {loading || !data ? (
@@ -84,22 +68,28 @@ export default function DashboardPage() {
             <RevenueTrendChart data={data.revenue_trend} />
           </div>
 
+          <div className="card">
+            <h2>Shopping Activity</h2>
+            <p className="card-subtitle">Completed orders by day of week and hour of day</p>
+            {heatmap && <ActivityHeatmap cells={heatmap} />}
+          </div>
+
           <div className="grid-2">
             <div className="card">
               <h2>Top Products</h2>
               <BreakdownBarChart data={data.top_products} dataKey="revenue" labelKey="name" height={320} />
             </div>
             <div className="card">
-              <h2>Revenue by Region</h2>
-              <BreakdownBarChart data={data.region_breakdown} dataKey="revenue" labelKey="region" height={320} />
+              <h2>Revenue by Category</h2>
+              <BreakdownBarChart data={data.category_breakdown} dataKey="revenue" labelKey="category" height={320} />
             </div>
             <div className="card">
-              <h2>Revenue by Category</h2>
-              <BreakdownBarChart data={data.category_breakdown} dataKey="revenue" labelKey="category" height={280} />
+              <h2>Revenue by Region</h2>
+              <StackedCompositionBar data={data.region_breakdown} labelKey="region" valueKey="revenue" />
             </div>
             <div className="card">
               <h2>Revenue by Channel</h2>
-              <BreakdownBarChart data={data.channel_breakdown} dataKey="revenue" labelKey="channel" height={220} />
+              <StackedCompositionBar data={data.channel_breakdown} labelKey="channel" valueKey="revenue" />
             </div>
           </div>
         </>

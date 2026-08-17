@@ -42,6 +42,8 @@ def _generate_narrative(kpis: dict, trend: list[dict], top_products: list[dict],
         prompt = (
             "Write a concise (120-180 word) executive summary of cumulative company "
             f"sales performance as of {as_of.isoformat()}, for a leadership report. "
+            "Do not include a title, heading, or markdown of any kind - output plain "
+            "prose paragraphs only, starting directly with the first sentence. "
             f"Cumulative revenue to date: ${kpis['total_revenue']:,.2f} across "
             f"{kpis['total_orders']:,} completed orders ({kpis['unique_customers']:,} unique customers). "
             f"Average order value: ${kpis['avg_order_value']:,.2f}. "

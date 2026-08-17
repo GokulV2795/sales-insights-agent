@@ -102,6 +102,15 @@ CATALOG = {
 SEGMENTS = ["Enterprise", "SMB", "Consumer"]
 SEGMENT_WEIGHTS = [0.15, 0.30, 0.55]
 
+# Shopping-activity curve by hour of day: quiet overnight, rising through the
+# morning, a lunchtime bump, and an evening peak — used for the order timestamp
+# and the activity heatmap so it shows real structure rather than noise.
+HOUR_WEIGHTS = [
+    0.15, 0.10, 0.08, 0.07, 0.08, 0.12, 0.20, 0.35,
+    0.50, 0.65, 0.75, 0.85, 1.00, 0.95, 0.80, 0.75,
+    0.80, 0.85, 0.90, 1.00, 0.95, 0.85, 0.55, 0.30,
+]
+
 # Relative demand weighting per category, to make some categories bestsellers.
 CATEGORY_WEIGHTS = {
     "Electronics": 0.34,
@@ -238,8 +247,9 @@ def build_dataset(session):
             total = round(unit_price * quantity * (1 - discount_pct / 100), 2)
             status = weighted_choice(STATUS_WEIGHTS)
 
+            hour = random.choices(range(24), weights=HOUR_WEIGHTS, k=1)[0]
             order_time = datetime.combine(d, datetime.min.time()) + timedelta(
-                hours=random.randint(0, 23), minutes=random.randint(0, 59)
+                hours=hour, minutes=random.randint(0, 59)
             )
 
             orders.append(
